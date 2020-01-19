@@ -100,10 +100,11 @@ def convert_field_to_list(field, registry=None):
         return base_type._meta.connection_field_class(base_type)
 
     # Non-relationship field
+    # Here causes some issues
     relations = (mongoengine.ReferenceField, mongoengine.EmbeddedDocumentField)
     if not isinstance(base_type, (graphene.List, graphene.NonNull)) \
             and not isinstance(field.field, relations):
-        base_type = type(base_type)
+        base_type = type(base_type)  # This line in specifics. It does not allow non-nullable fields. Take, for instance, if base_type was a non nullable string, it would return a plain string.
 
     return graphene.List(base_type, description=get_field_description(field, registry), required=field.required)
 
